@@ -162,10 +162,7 @@ public class PlantsVSZombies extends Application {
     }
     
     
-    @Override
-    public void start(Stage primaryStage){
-        
-        window = primaryStage;
+    public void menu(){
         Button btn1 = createButton("New Profile", 0, 0);
         Button btn2 = createButton("Existing Profile", 0, 35);
         Button btn3 = createButton("Exit", 0, 70);
@@ -173,10 +170,19 @@ public class PlantsVSZombies extends Application {
         Pane pane = createPane();
         pane.getChildren().addAll(lbl, btn1, btn2, btn3);
         Scene scene = createScene(pane, 500, 500);
-        primaryStage = createStage(primaryStage, scene, "PLANTS VS ZOMBIES");
+        window.setTitle("PLANTS VS ZOMBIES");
+        window.setScene(scene);
         btn1.setOnAction(e -> btn1Action(scene));
         btn3.setOnAction(e -> btn3Action());
-        primaryStage.show();
+        window.show();
+    }
+    
+    
+    @Override
+    public void start(Stage primaryStage){
+        
+        window = primaryStage;
+        menu();
         
     }
 
