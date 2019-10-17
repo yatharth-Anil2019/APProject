@@ -37,6 +37,8 @@ public class PlantsVSZombies extends Application {
     private static final double minHeight = 30;
     private static final double minWidth = 30;
     Stage window;
+    Label menuBackground;
+    Scene menuBackgroundScene;
     
     public Button createButton(String btnTitle, double xCoordinate, double yCoordinate){
         Button btn = new Button(btnTitle);
@@ -71,8 +73,10 @@ public class PlantsVSZombies extends Application {
         return label;
     }
     
-    public Label createImageLabel(String text, String imageLocation, double xCoordinate, double yCoordinate)throws IOException{
+    public Label createImageLabel(String text, String imageLocation, int width, int height)throws IOException{
         ImageView imageView = importImage(imageLocation);
+        imageView.setFitHeight(height);
+        imageView.setFitWidth(width);
         Label label = new Label(text, imageView);
         return label;
     }
@@ -121,17 +125,23 @@ public class PlantsVSZombies extends Application {
     
     public void btn1ConfirmationButton(Scene scene)throws InterruptedException{
         Label label = createTextLabel("Profile Created", 200, 200);
-        Button btn = createButton("OK", 225, 240);
+        Button okBtn = createButton("OK", 225, 240);
         Pane pane = createPane();
-        pane.getChildren().addAll(label, btn);
+        pane.getChildren().addAll(menuBackground, label, okBtn);
         Scene scene1 = createScene(pane, 500, 500);
         window.setScene(scene1);
-        btn.setOnAction(e -> window.setScene(scene));
+        okBtn.setOnAction(e -> {
+            try {
+                menu();
+            } catch (IOException ex) {
+                //Handling IOException
+            }
+        });
     }
     
     
-    public void btn1BackButton(Scene scene){
-        window.setScene(scene);
+    public void btn1BackButton(Scene scene)throws IOException{
+        menu();
     }
     
     
@@ -141,7 +151,7 @@ public class PlantsVSZombies extends Application {
         Button btn1BackButton = createButton("Back", 280, 150);
         Label btn1Label = createTextLabel("Username: ", 70, 120);
         TextField btn1TextField = createTextField(150, 115);
-        btn1Pane.getChildren().addAll(btn1ConfirmButton, btn1BackButton, btn1Label, btn1TextField);
+        btn1Pane.getChildren().addAll(menuBackground, btn1ConfirmButton, btn1BackButton, btn1Label, btn1TextField);
         Scene btn1Scene = createScene(btn1Pane, 500, 500);
         window.setScene(btn1Scene);
         
@@ -153,7 +163,13 @@ public class PlantsVSZombies extends Application {
                 //Handeled InterruptedException
             }
         });
-        btn1BackButton.setOnAction(e -> btn1BackButton(scene));
+        btn1BackButton.setOnAction(e -> {
+            try {
+                btn1BackButton(scene);
+            } catch (IOException ex) {
+                //Handeling IOEXception
+            }
+        });
     }
     
     
@@ -162,24 +178,24 @@ public class PlantsVSZombies extends Application {
     }
     
     
-    public void menu(){
+    public void menu()throws IOException{
         Button btn1 = createButton("New Profile", 0, 0);
         Button btn2 = createButton("Existing Profile", 0, 35);
         Button btn3 = createButton("Exit", 0, 70);
-        Label lbl = createTextLabel("MENU", 150, 150);
+        menuBackground = createImageLabel("MENU", "D:/NetBeans 8.0.2/Projects/PlantsVSZombies/src/Plants VS Zombies Images/MenuImage.PNG", 500, 500);
         Pane pane = createPane();
-        pane.getChildren().addAll(lbl, btn1, btn2, btn3);
-        Scene scene = createScene(pane, 500, 500);
+        pane.getChildren().addAll(menuBackground, btn1, btn2, btn3);
+        menuBackgroundScene = createScene(pane, 500, 500);
         window.setTitle("PLANTS VS ZOMBIES");
-        window.setScene(scene);
-        btn1.setOnAction(e -> btn1Action(scene));
+        window.setScene(menuBackgroundScene);
+        btn1.setOnAction(e -> btn1Action(menuBackgroundScene));
         btn3.setOnAction(e -> btn3Action());
         window.show();
     }
     
     
     @Override
-    public void start(Stage primaryStage){
+    public void start(Stage primaryStage)throws IOException{
         
         window = primaryStage;
         menu();
