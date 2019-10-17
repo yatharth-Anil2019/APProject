@@ -25,6 +25,8 @@ import java.util.concurrent.TimeUnit;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 import javafx.animation.PauseTransition;
+import javafx.scene.paint.Color;
+import javafx.scene.text.Font;
 import javafx.util.Duration;
 
 
@@ -124,8 +126,10 @@ public class PlantsVSZombies extends Application {
     
     
     public void btn1ConfirmationButton(Scene scene)throws InterruptedException{
-        Label label = createTextLabel("Profile Created", 200, 200);
-        Button okBtn = createButton("OK", 225, 240);
+        Font font = new Font("Aerial", 24);
+        Label label = createTextLabel("Profile Created", 150, 140);
+        label.setFont(font);
+        Button okBtn = createButton("OK", 215, 180);
         Pane pane = createPane();
         pane.getChildren().addAll(menuBackground, label, okBtn);
         Scene scene1 = createScene(pane, 500, 500);
