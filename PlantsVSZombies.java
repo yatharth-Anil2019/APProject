@@ -21,6 +21,7 @@ import javafx.scene.image.ImageView;
 import javafx.scene.layout.*;
 import javafx.stage.Stage;
 import java.io.*;
+import java.util.*;
 import java.util.concurrent.TimeUnit;
 import java.util.logging.Level;
 import java.util.logging.Logger;
@@ -34,21 +35,43 @@ import javafx.util.Duration;
  *
  * @author imyat
  */
+
+
+
+class PlayerProfile implements Serializable{
+    
+    String playerName;
+    ArrayList<String> playerNameList = new ArrayList<>();
+    public void setPlayerName(String name){
+        playerName = name;
+        playerNameList.add(name);
+    }
+    
+    public ArrayList getPlayerNameList(){
+        return playerNameList;
+    }
+}
+
+
+
+
+
+
 public class PlantsVSZombies extends Application {
     
-    private static final double minHeight = 30;
-    private static final double minWidth = 30;
+    PlayerProfile profile = new PlayerProfile();
+    
     Stage window;
     Label menuBackground;
     Scene menuBackgroundScene;
+    
+    ArrayList<String> playerNameList = new ArrayList<>();
     
     public Button createButton(String btnTitle, double xCoordinate, double yCoordinate){
         Button btn = new Button(btnTitle);
         btn.setMaxSize(300, 300);
         btn.setLayoutX(xCoordinate);
         btn.setLayoutY(yCoordinate);
-        //btn.setMinHeight(minHeight);
-        //btn.setMinWidth(minWidth);
         return btn;
     }
     
@@ -111,15 +134,6 @@ public class PlantsVSZombies extends Application {
     }
     
     
-    /*public void addButtonToPane(Pane pane, Button btn){
-        pane.getChildren().add(btn);
-    }
-    
-    
-    public void addLabelToPane(Pane pane, Label label){
-        pane.getChildren().add(label);
-    }*/
-    
     public void addToPane(Pane pane, Parent parent){
         pane.getChildren().add(parent);
     }
@@ -161,6 +175,8 @@ public class PlantsVSZombies extends Application {
         
         btn1ConfirmButton.setOnAction(e -> {
             try{
+                //System.out.println(btn1TextField.getText());
+                profile.setPlayerName(btn1TextField.getText());
                 btn1ConfirmationButton(scene);
             }
             catch(Exception ex){
@@ -177,8 +193,101 @@ public class PlantsVSZombies extends Application {
     }
     
     
-    public void btn3Action(){
+    public void btn2Action(int xCoordinate, int yCoordinate)throws IOException{
+        Pane pane = createPane();
+        addToPane(pane, menuBackground);
+        Font font= new Font("Aerial", 24);
+        if(playerNameList.size() == 0){
+            Button btn = createButton("EMPTY", 180, 180);
+            btn.setFont(font);
+            addToPane(pane, btn);
+            btn.setOnAction(e -> {
+                try{
+                    menu();
+                }
+                catch(IOException ex){
+                    //IOException handled
+                }
+            });
+        }
+        else{
+            Label[] lbl = new Label[playerNameList.size()];
+            for(int i=0; i<lbl.length; i++){
+                lbl[i] = createTextLabel(playerNameList.get(i), xCoordinate, yCoordinate);
+                lbl[i].setFont(font);
+                /*if(playerNameList.get(i).equals("")){
+                    System.out.println("NULL");
+                }
+                else{
+                    System.out.println(playerNameList.get(i));
+                }*/
+                pane.getChildren().add(lbl[i]);
+                yCoordinate += 40;
+            }
+            yCoordinate += 40;
+            Button loadButton = createButton("LOAD", xCoordinate, yCoordinate);
+            Button backButton = createButton("BACK", xCoordinate + 80, yCoordinate);
+
+            backButton.setOnAction(e -> {
+                try{
+                    menu();
+                }
+                catch(IOException ex){
+                    //IOException Handeled
+                }
+            });
+
+
+            loadButton.setOnAction(e -> {
+               try{
+                   menu();
+               } 
+               catch(Exception ex){
+                   //IOExceptionHandeled + Class Not Found Exception Handeled
+               }
+            });
+
+            pane.getChildren().addAll(loadButton, backButton);
+        }
+        
+        Scene scene = createScene(pane, 500, 500);
+        window.setScene(scene);
+        
+    }
+    
+    
+    
+    public void noButtonAction(){
         System.exit(0);
+    }
+    
+    public void yesButtonAction()throws IOException{
+        ObjectOutputStream oos = new ObjectOutputStream(new FileOutputStream("D:/NetBeans 8.0.2/Projects/PlantsVSZombies/src/playerNameList.txt"));
+        oos.writeObject(profile);
+        oos.close();
+        System.exit(0);
+    }
+    
+    
+    public void btn3Action() throws IOException{
+        Label lbl = createTextLabel("Do you want to save changes", 100, 180);
+        Font font = new Font("Aerial", 24);
+        lbl.setFont(font);
+        Button yesButton = createButton("Yes", 190, 220);
+        Button noButton = createButton("No", 240, 220);
+        Pane pane = createPane();
+        pane.getChildren().addAll(menuBackground, lbl, yesButton, noButton);
+        Scene scene = new Scene(pane, 500, 500);
+        window.setScene(scene);
+        noButton.setOnAction(e -> noButtonAction());
+        yesButton.setOnAction(e -> {
+            try{
+                yesButtonAction();
+            }
+            catch(IOException ex){
+                //handeled IOException
+            }
+        });
     }
     
     
@@ -193,16 +302,42 @@ public class PlantsVSZombies extends Application {
         window.setTitle("PLANTS VS ZOMBIES");
         window.setScene(menuBackgroundScene);
         btn1.setOnAction(e -> btn1Action(menuBackgroundScene));
-        btn3.setOnAction(e -> btn3Action());
+        
+        btn2.setOnAction(e -> {
+            try {
+                btn2Action(180, 200);
+            } catch (IOException ex) {
+                //IOException Handeled
+            }
+        });
+        
+        
+        btn3.setOnAction(e -> {
+            try {
+                btn3Action();
+            } catch (IOException ex) {
+                //Handeled IOException
+            }
+        });
         window.show();
     }
     
     
     @Override
-    public void start(Stage primaryStage)throws IOException{
+    public void start(Stage primaryStage)throws IOException, ClassNotFoundException{
         
         window = primaryStage;
+        try{
+            ObjectInputStream ois = new ObjectInputStream(new FileInputStream("D:/NetBeans 8.0.2/Projects/PlantsVSZombies/src/playerNameList.txt"));
+            profile = (PlayerProfile)ois.readObject();
+            playerNameList = profile.getPlayerNameList();
+            ois.close();
+        }
+        catch(Exception ex){
+            
+        }
         menu();
+        window.show();
         
     }
 
